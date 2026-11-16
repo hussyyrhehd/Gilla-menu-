@@ -73,7 +73,10 @@ public class GillaModMenu : MonoBehaviour
         }
     }
 
-    bool Allowed => allowInReleaseBuilds || Application.isEditor || Debug.isDebugBuild;
+    bool Allowed
+    {
+        get { return allowInReleaseBuilds || Application.isEditor || Debug.isDebugBuild; }
+    }
 
     // ------------------------------------------------------------------ setup
 
@@ -306,3 +309,22 @@ public class GillaModMenu : MonoBehaviour
     void SetVelocity(Vector3 v)
     {
 #if UNITY_6000_0_OR_NEWER
+playerBody.linearVelocity = v;
+#else
+playerBody.velocity = v;
+#endif
+}
+// ------------------------------------------------------------------ cleanup
+void OnDisable()
+{
+if (noclipOn) { noclipOn = false; ApplyNoclip(false); }
+if (wasFree && playerBody != null) playerBody.useGravity = savedGravity;
+wasFree = false;
+}
+void OnDestroy()
+{
+if (leftPlatform != null) Destroy(leftPlatform);
+if (rightPlatform != null) Destroy(rightPlatform);
+if (menuText != null) Destroy(menuText.gameObject);
+}
+}
